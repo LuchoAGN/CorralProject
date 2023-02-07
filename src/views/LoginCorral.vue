@@ -75,6 +75,8 @@ export default {
   },
   methods:{
     login: async function (){
+      var infoperson = null
+      var tokenO = null;
       var obj = {
         email: this.email,
         password: this.password
@@ -82,12 +84,33 @@ export default {
 
       await api
         .request("post", "/login", obj)
-        .then((data) => {
-            console.log(data)
+        .then((response) => {
+          console.log(response)
+          tokenO = response.data.token
         })
         .catch(function (e) {
             console.log(e);
         });
+
+      if(tokenO != null){
+        const config = {
+          Authorization: `Bearer ${tokenO}`,
+        };
+        await api
+        .requestH("get", "/user-profile", config)
+        .then((response) => {
+          infoperson = { 
+            dataperson: response.data.userData,
+            token: tokenO        
+          }
+        })
+        .catch(function (e) {
+            console.log(e);
+        });
+      }
+      if(infoperson != null){
+        window.localStorage.setItem("user", JSON.stringify(infoperson));
+      }
     }
   },
   watch: {

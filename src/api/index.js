@@ -16,9 +16,28 @@ export default {
     var url = serverURI + uri
 
     return axios({
-      method: method,
-      url: url,
-      data: data
+      method,
+      url,
+      data,
+    });
+  },
+  requestH(method, uri, headers) {
+    if (!method) {
+      console.error('API function call requires method argument')
+      return
+    }
+
+    if (!uri) {
+      console.error('API function call requires uri argument')
+      return
+    }
+
+    var url = serverURI + uri
+    
+    return axios({
+      method,
+      url,
+      headers,
     });
   }
 }
