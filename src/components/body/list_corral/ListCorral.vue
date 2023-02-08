@@ -8,16 +8,41 @@
                 color="primary"
                 style="height: 55vh; overflow-y: scroll!important;"
                 >
+                    <div v-for="(item, i) in dataCorral"
+                    :key="i">
                     <v-list-item
-                        v-for="(item, i) in dataCorral"
-                        :key="i"
-                    >
+                        
+                    >   
                         <v-list-item-content>
-                            <v-list-item-title v-text="`Nombre: ${item.name}`"></v-list-item-title>
-                            <v-list-item-title v-text="`Numero de pollos: ${item.num_chicken}`"></v-list-item-title>
-                            <v-list-item-title v-text="`Precio unitario: ${item.price_chicken}$`"></v-list-item-title>
+                            <v-list-item-title class="mb-2" v-text="`Nombre: ${item.name}`"/>
+                            <!-- <v-list-item-title class="mb-2" v-text="``"/> -->
+
+                            <v-list-item-title v-text="`Total vendidos:`"/>
+                            <v-list-item-title class="mb-2" v-text="`${item.sales_chicken}`"/>
+
+                            <v-list-item-title v-text="`Balance estimado:`"/>
+                            <v-list-item-title class="mb-2" v-text="`${parseInt(item.price_chicken)*parseInt(item.num_chicken)}$`"/>
+
+                            <v-list-item-title v-text="`Recaudo:`"/>
+                            <v-list-item-title class="mb-2" v-text="`${parseInt(item.price_chicken)*parseInt(item.sales_chicken)}$`"/>
+
                         </v-list-item-content>
+                        <v-list-item-content>
+                            <v-list-item-title v-text="`Numero de pollos:`"/>
+                            <v-list-item-title class="mb-2" v-text="`${item.num_chicken}`"/>
+
+                            <v-list-item-title v-text="`Total muertos:`"/>
+                            <v-list-item-title class="mb-2" v-text="`${item.deaths_chicken}`"/>
+
+                            <v-list-item-title v-text="`Gastos de insumo:`"/>
+                            <v-list-item-title v-text="`0$`"/>
+                            
+                        </v-list-item-content>
+                        
                     </v-list-item>
+                    <v-divider/>
+                </div>
+                    
                 </v-list-item-group>
             </v-list>
         </v-card>
