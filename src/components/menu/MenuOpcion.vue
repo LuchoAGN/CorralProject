@@ -1,41 +1,52 @@
 <template>
-  <v-bottom-navigation
-    v-model="value"
-    :background-color="color"
-    dark
-    shift
-  >
-    <v-btn>
-      <span>Crear</span>
+  <div>
+    <v-bottom-navigation
+      v-model="value"
+      :background-color="color"
+      dark
+      shift
+    >
+      <v-btn>
+        <span>Crear</span>
 
-      <v-icon>mdi-table-row-plus-after</v-icon>
-    </v-btn>
+        <v-icon>mdi-table-row-plus-after</v-icon>
+      </v-btn>
 
-    <v-btn>
-      <span>Activos</span>
+      <v-btn>
+        <span>Activos</span>
 
-      <v-icon>mdi-table-row </v-icon>
-    </v-btn>
+        <v-icon>mdi-table-row </v-icon>
+      </v-btn>
 
-    <v-btn>
-      <span>Facturacion</span>
+      <v-btn>
+        <span>Facturacion</span>
 
-      <v-icon>mdi-table-row-height</v-icon>
-    </v-btn>
+        <v-icon>mdi-table-row-height</v-icon>
+      </v-btn>
 
-    <v-btn>
-      <span>Historial</span>
+      <v-btn>
+        <span>Historial</span>
 
-      <v-icon>mdi-table-arrow-down</v-icon>
-    </v-btn>
-  </v-bottom-navigation>
+        <v-icon>mdi-table-arrow-down</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
+
+    <bodyCard :color="color"/>
+
+  </div>
 </template>
 <script>
+
+import bodyCard from '../body/BodyCard.vue';
+
 export default {
     name: 'MenuOpt',
+    components:{
+      bodyCard
+    },
     data(){
         return{
-            value: 1
+          value: 1,
         }
     },
     computed: {
@@ -48,6 +59,12 @@ export default {
           default: return 'blue-grey'
         }
       },
+    },
+    mounted(){
+      window.scrollTo(0, 0);
+    },
+    methods:{
+
     }
 }
 </script>

@@ -8,28 +8,27 @@
         <h1 class="text-title pt-3">
           Ingrese al sistema
         </h1>
-        <form @submit.prevent="submit" class="pa-6 ma-2">
-            <v-text-field
-              v-model="email"
-              :rules="[rules.required]"
-              label="E-mail"
-            ></v-text-field>
+        <form @submit.prevent="login();" class="pa-6 ma-2">
+          <v-text-field
+            v-model="email"
+            :rules="[rules.required]"
+            label="E-mail"
+          ></v-text-field>
 
-            <v-text-field
-              :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="[rules.required, rules.min]"
-              :type="show ? 'text' : 'password'"
-              name="input-10-2"
-              label="Contraseña"
-              hint="Al menos 8 caracteres"
-              v-model="password"
-              class="input-group--focused"
-              @click:append="show = !show"
-            ></v-text-field>
+          <v-text-field
+            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+            :rules="[rules.required, rules.min]"
+            :type="show ? 'text' : 'password'"
+            name="input-10-2"
+            label="Contraseña"
+            hint="Al menos 8 caracteres"
+            v-model="password"
+            class="input-group--focused"
+            @click:append="show = !show"
+          ></v-text-field>
           <v-btn
             :loading="loading"
             :disabled="loading"
-            @click="login(); loader = 'loading';"
             block
             class="mt-6"
             color="success"
@@ -46,9 +45,33 @@
         </form>
       </v-card>
     </v-container>
+
+    <v-snackbar
+      v-model="notiFail"
+      color="red accent-2"
+      outlined
+      timeout="5000"
+      :top="true"
+    >
+      Email o contraseña incorrecta
+
+      <template v-slot:action="{ attrs }">
+          <v-btn
+          color="red accent-2"
+          text
+          v-bind="attrs"
+          @click="notiFail = false"
+          >
+          <v-icon>
+              mdi-close
+          </v-icon>
+          </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 <script>
+
 import api from '../api/index.js';
 
 export default {
@@ -67,7 +90,7 @@ export default {
         min: v => v.length >= 8 || 'Minimo 8 caracteres',
       },
       loading: false,
-      loader: null
+      notiFail: false,
     }
   },
   mounted(){
@@ -75,6 +98,9 @@ export default {
   },
   methods:{
     login: async function (){
+      var self = this;
+
+      self.loading = true;
       var infoperson = null
       var tokenO = null;
       var obj = {
@@ -85,11 +111,10 @@ export default {
       await api
         .request("post", "/login", obj)
         .then((response) => {
-          console.log(response)
           tokenO = response.data.token
         })
-        .catch(function (e) {
-            console.log(e);
+        .catch(function () {
+          self.notiFail = true;
         });
 
       if(tokenO != null){
@@ -104,24 +129,20 @@ export default {
             token: tokenO        
           }
         })
-        .catch(function (e) {
-            console.log(e);
+        .catch(function () {
+          self.notiFail = true;
         });
       }
+
       if(infoperson != null){
         window.localStorage.setItem("user", JSON.stringify(infoperson));
+        this.$router.push("/");
+        window.location.reload();
       }
+      self.loading = false;
     }
   },
   watch: {
-    loader () {
-      const l = this.loader
-      this[l] = !this[l]
-
-      setTimeout(() => (this[l] = false), 3000)
-
-      this.loader = null
-    },
   },
 }
 </script>

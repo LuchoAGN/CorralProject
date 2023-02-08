@@ -18,7 +18,7 @@ export default {
     return axios({
       method,
       url,
-      data,
+      data
     });
   },
   requestH(method, uri, headers) {
@@ -37,7 +37,27 @@ export default {
     return axios({
       method,
       url,
-      headers,
+      headers
+    });
+  },
+  requestOH(method, uri, data, headers) {
+    if (!method) {
+      console.error('API function call requires method argument')
+      return
+    }
+
+    if (!uri) {
+      console.error('API function call requires uri argument')
+      return
+    }
+
+    var url = serverURI + uri
+    
+    return axios({
+      method,
+      url,
+      data,
+      headers
     });
   }
 }
