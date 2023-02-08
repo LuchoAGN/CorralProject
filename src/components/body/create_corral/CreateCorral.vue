@@ -50,6 +50,38 @@
             </form>
         </v-card>
 
+        <v-card elevation="1" v-if="dataCorral.length > 0" class="mt-4">
+            <v-list>
+                <v-subheader class="text-subtitle">Corrales</v-subheader>
+                <v-list-item-group
+                  color="primary"
+                  style="height: 20vh; overflow-y: scroll!important;"
+                >
+                  <v-list-item
+                    v-for="(item, i) in dataCorral"
+                    :key="i"
+                  >
+                    <v-list-item-icon>
+                        <font-awesome-icon icon="fa-solid fa-xmarks-lines" class="fa-3x" 
+                            :class="item.status == 'active' ? 'xmarks_active' : 'xmark_desactive'"/>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title v-text="`Nombre: ${item.name}`"></v-list-item-title>
+                        <v-list-item-title v-text="`Numero de pollos: ${item.num_chicken}`"></v-list-item-title>
+                        <v-list-item-title v-text="`Precio unitario: ${item.price_chicken}$`"></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+            </v-list>
+        </v-card>
+
+        <v-overlay :value="overlay">
+            <v-progress-circular
+                indeterminate
+                size="64"
+            ></v-progress-circular>
+        </v-overlay>
+
         <v-snackbar
             v-model="notiSuccess"
             color="success"
@@ -105,6 +137,7 @@ export default {
     name: "CreateCorral",
     data(){
         return{
+            overlay: true,
             loading: false,
             rules: {
                 required: value => !!value || 'Requerido',
@@ -114,11 +147,12 @@ export default {
             price_chicken: '',
             id_user: JSON.parse(localStorage.getItem('user')).dataperson.id,
             notiSuccess: false,
-            notiFail: false
+            notiFail: false,
+            dataCorral: []
         }
     },
     mounted(){
-
+        this.getDataCorral();
     },
     methods:{
         createCorrales: async function(){
@@ -130,31 +164,56 @@ export default {
                 status: "active",
                 sales_chicken: 0,
                 deaths_chicken: 0,
-                id_user: this.id_user
+                id_user: this.id_user,
             };
             const config = {
                 Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
             };
             await api
                 .requestOH("post", "/corrales", obj, config)
-                .then((response) => {
-                    console.log(response)
+                .then(() => {
                     self.notiSuccess = true;
                 })
-                .catch(function (e) {
+                .catch(function () {
                     self.notiFail = true;
-                    console.log(e);
                 });
             
             if(this.notiSuccess){
                 this.name = '';
                 this.num_chicken = '';
                 this.price_chicken = '';
+                await this.getDataCorral();
             }
+        },
+        getDataCorral: async function(){
+            var self = this;
+            const config = {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
+            };
+            await api
+                .requestH("get", `/corrales/${JSON.parse(localStorage.getItem('user')).dataperson.id}`, 
+                    config)
+                .then((response) => {
+                    self.dataCorral = response.data;
+                    self.overlay = false;
+                })
+                .catch(function () {
+                });
         }
     }
 }
 </script>
 <style>
+
+    .xmarks_active{
+        color: #a18262;
+    }
     
+    .xmarks_desactive{
+        color: grey;
+    }
+
+    .text-subtitle{
+        font-size:  20px;
+    }
 </style>
