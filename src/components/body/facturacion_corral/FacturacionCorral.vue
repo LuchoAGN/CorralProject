@@ -9,7 +9,6 @@
                 justify-content: space-between;"
             >
                 <v-select
-                    id="select-corral"
                     class="ma-2"
                     :items="items"
                     label="Seleccione un corral"
@@ -78,7 +77,7 @@ export default {
 }
 </script>
 <style>
-    #select-corra .v-text-field__details {
+    .v-text-field__details {
         display: none!important;
     }
 </style>
