@@ -10,6 +10,7 @@
                 <v-row>
                     <v-col cols="12">
                         <v-text-field
+                            height="13"
                             v-model="name"
                             :rules="[rules.required]"
                             label="Nombre del corral"
@@ -19,6 +20,7 @@
                 <v-row>
                     <v-col cols="6">
                         <v-text-field
+                            height="13"
                             v-model="num_chicken"
                             :rules="[rules.required]"
                             label="Numero de pollos"
@@ -26,6 +28,7 @@
                     </v-col>
                     <v-col cols="6">
                         <v-text-field
+                            height="13"
                             v-model="price_chicken"
                             :rules="[rules.required]"
                             label="Precio unitario de los pollos"
@@ -39,6 +42,7 @@
                     class="mt-6"
                     color="success"
                     type="submit"
+                    small
                 >
                     Crear Corral
                     <template v-slot:loader>
@@ -55,7 +59,7 @@
                 <v-subheader class="text-subtitle">Corrales</v-subheader>
                 <v-list-item-group
                   color="primary"
-                  style="height: 20vh; overflow-y: scroll!important;"
+                  style="height: 25vh; overflow-y: scroll!important;"
                 >
                   <v-list-item
                     v-for="(item, i) in dataCorral"
@@ -66,9 +70,9 @@
                             :class="item.status == 'active' ? 'xmarks_active' : 'xmark_desactive'"/>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title v-text="`Nombre: ${item.name}`"></v-list-item-title>
-                        <v-list-item-title v-text="`Numero de pollos: ${item.num_chicken}`"></v-list-item-title>
-                        <v-list-item-title v-text="`Precio unitario: ${item.price_chicken}$`"></v-list-item-title>
+                        <v-list-item-title class="text-a" v-text="`Nombre: ${item.name}`"></v-list-item-title>
+                        <v-list-item-title class="text-a" v-text="`Numero de pollos: ${item.num_chicken}`"></v-list-item-title>
+                        <v-list-item-title class="text-a" v-text="`Precio unitario: ${(item.price_chicken).toLocaleString('es-CO')}$`"></v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list-item-group>
@@ -165,6 +169,7 @@ export default {
                 sales_chicken: 0,
                 deaths_chicken: 0,
                 id_user: this.id_user,
+                value_insumo: 0,
             };
             const config = {
                 Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
@@ -215,5 +220,12 @@ export default {
 
     .text-subtitle{
         font-size:  20px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: #212121!important;
     }
+    .v-label{
+        font-size: 12px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
 </style>

@@ -1,5 +1,5 @@
 import axios from 'axios'
-var serverURI = 'https://corral-api.hygprueba.com/api'
+var serverURI = 'http://192.168.10.3:8000/api'
 
 export default {
   request (method, uri, data = null) {
