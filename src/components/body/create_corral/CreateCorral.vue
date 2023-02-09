@@ -20,6 +20,7 @@
                 <v-row>
                     <v-col cols="6">
                         <v-text-field
+                        type="number"
                             height="13"
                             v-model="num_chicken"
                             :rules="[rules.required]"
@@ -28,6 +29,7 @@
                     </v-col>
                     <v-col cols="6">
                         <v-text-field
+                            type="number"
                             height="13"
                             v-model="price_chicken"
                             :rules="[rules.required]"
@@ -196,7 +198,7 @@ export default {
                 Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
             };
             await api
-                .requestH("get", `/corrales/${JSON.parse(localStorage.getItem('user')).dataperson.id}`, 
+                .requestH("get", `/corrales/${this.id_user}`, 
                     config)
                 .then((response) => {
                     self.dataCorral = response.data;

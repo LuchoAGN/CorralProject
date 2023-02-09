@@ -21,9 +21,10 @@
         isAdmin: null,
       }
     },  
-    mounted(){
-      this.detectRol();
+    mounted: async function(){
+      await this.detectRol();
       window.scrollTo(0, 0);
+
     },
     methods:{
       detectRol: async function(){
@@ -32,7 +33,7 @@
         }else{
           this.isAdmin = true;
         }
-      }
+      },
     }
   }
 </script>

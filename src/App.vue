@@ -59,11 +59,9 @@ export default {
       const config = {
         Authorization: `Bearer ${JSON.parse(localStorage.user).token}`,
       };
-      console.log(config);
       await api
         .requestH("post", "/logout", config)
         .then((response) => {
-          console.log(response);
           if(response.status == 200){
             localStorage.removeItem("user");
             self.$router.replace("/login");

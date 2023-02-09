@@ -55,6 +55,16 @@
                             ></v-text-field>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="6">
+                            <v-text-field
+                                type="number"
+                                v-model="max_corral"
+                                :rules="[rules.required]"
+                                label="Maximo de corrales"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-btn
                         :loading="loading"
                         :disabled="loading"
@@ -143,7 +153,8 @@ export default {
             email: '',
             name: '',
             password: '',
-            password_confirmation: ''
+            password_confirmation: '',
+            max_corral: 0,
         }
     },
     mounted(){
@@ -157,7 +168,8 @@ export default {
                 email: this.email,
                 password: this.password,
                 password_confirmation: this.password_confirmation,
-                rol: "user"
+                rol: "user",
+                max_corral: this.max_corral,
             };
             const config = {
                 Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
@@ -176,6 +188,7 @@ export default {
                 this.name = '';
                 this.password = '';
                 this.password_confirmation = '';
+                this.max_corral = 0;
             }
         }
     }

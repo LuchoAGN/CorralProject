@@ -11,7 +11,7 @@
                         >
                             <v-expansion-panel-header>
                                 <p class="text-a"><strong>{{item.name}}</strong></p>
-                                <p class="text-a"><strong>Ganancia estimada: {{ (item.price_chicken*item.num_chicken).toLocaleString('es-CO') }}$</strong></p>
+                                <p class="text-a"><strong>Ganancia estimada: {{ (((item.price_chicken*item.num_chicken)-parseInt(item.value_insumo)-(item.deaths_chicken*item.price_chicken))).toLocaleString('es-CO') }}$</strong></p>
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
                                 <div class="panel-row">
@@ -65,7 +65,6 @@ export default {
                 .requestH("get", `/corrales/${JSON.parse(localStorage.getItem('user')).dataperson.id}`, 
                     config)
                 .then((response) => {
-                    console.log(response)
                     self.dataCorral = response.data;
                     self.overlay = false;
                 })

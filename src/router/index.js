@@ -6,6 +6,7 @@ import LoginCorral from '../views/LoginCorral.vue'
 Vue.use(VueRouter)
 
 const guest = (to, from, next) => {
+
   if (!localStorage.getItem('user')) {
     return next()
   } else {
