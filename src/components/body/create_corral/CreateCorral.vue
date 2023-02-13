@@ -225,6 +225,7 @@ export default {
         font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         color: #212121!important;
     }
+    
     .v-label{
         font-size: 12px;
         font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;

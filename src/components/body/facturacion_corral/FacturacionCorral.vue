@@ -38,6 +38,21 @@
                     <p class="text-a">Ganancia estimada: {{ (((filtData.price_chicken*filtData.num_chicken)-parseInt(filtData.value_insumo)-(filtData.deaths_chicken*filtData.price_chicken))).toLocaleString('es-CO') }}$</p>
                 </div>
             </div>
+            <v-fab-transition>
+                <v-btn
+                style="margin-bottom: 50px; right: 30px;"
+                color="brown"
+                outlined
+                fab
+                absolute
+                bottom
+                right
+                small
+                @click="activeDialog();"
+                >
+                    <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+            </v-fab-transition>
         </v-card>
 
         <v-card
@@ -72,6 +87,7 @@
                             type="number"
                             height="13"
                             v-model="value_insumo"
+                            :rules="[rules.value_tope]"
                             label="Costo del insumo"
                         ></v-text-field>
                     </v-col>
@@ -134,7 +150,7 @@
             timeout="5000"
             :top="true"
         >
-            Se ha registrado los costos
+            Se ha registrado los cambios del corral
 
             <template v-slot:action="{ attrs }">
                 <v-btn
@@ -171,33 +187,46 @@
                 </v-btn>
             </template>
         </v-snackbar>
+        <dialogFacturacion :activeEdit="activeEdit" :filtData="filtData"/>
     </div>
 </template>
 <script>
 
 import api from '../../../api/index.js';
+import dialogFacturacion from './modals/DialogFacturacion.vue';
 
 export default {
     name: 'FactuarionCorral',
+    components:{
+        dialogFacturacion
+    },
     data(){
         return{
+            activeEdit: false,
             notiFail: false,
             notiSuccess: false,
             rules: {
-                tope_sales_chicken: value => this.deaths_chicken == null ? 
-                    true : (parseInt(this.deaths_chicken)+parseInt(value) <= this.filtData.num_chicken ? 
+                tope_sales_chicken: value => this.deaths_chicken == 0 ? 
+                (parseInt(value) <= this.filtData.num_chicken ? 
+                    (parseInt(value)+this.filtData.sales_chicken+this.filtData.deaths_chicken) <= this.filtData.num_chicken : 
+                    "Supera el numero de pollos") : (parseInt(this.deaths_chicken)+parseInt(value) <= this.filtData.num_chicken ? 
                     (parseInt(this.deaths_chicken)+parseInt(value)+this.filtData.sales_chicken+this.filtData.deaths_chicken) <= this.filtData.num_chicken : 
                     "Supera el numero de pollos"),
 
-                tope_deaths_chicken: value => this.sales_chicken == null ? 
-                    true : (parseInt(this.sales_chicken)+parseInt(value) <= this.filtData.num_chicken ? 
+                tope_deaths_chicken: value => this.sales_chicken == 0 ? 
+                (parseInt(value) <= this.filtData.num_chicken ? 
+                    (parseInt(value)+this.filtData.sales_chicken+this.filtData.deaths_chicken) <= this.filtData.num_chicken : 
+                    "Supera el numero de pollos") : (parseInt(this.sales_chicken)+parseInt(value) <= this.filtData.num_chicken ? 
                     (parseInt(this.sales_chicken)+parseInt(value)+this.filtData.sales_chicken+this.filtData.deaths_chicken) <= this.filtData.num_chicken : 
-                    "Supera el numero de pollos")
+                    "Supera el numero de pollos"),
+                
+                value_tope: value => value < ((this.filtData.price_chicken*this.filtData.num_chicken)-(this.filtData.price_chicken*this.filtData.deaths_chicken))-this.filtData.value_insumo 
+                    || "No puede exceder las ganacias",
             },
             loading: false,
-            sales_chicken: null,
-            deaths_chicken: null,
-            value_insumo: null,
+            sales_chicken: 0,
+            deaths_chicken: 0,
+            value_insumo: 0,
             activeFinish: false,
             items: [],
             dataCorral: [],
@@ -212,6 +241,10 @@ export default {
         this.getDataCorral();
     },
     methods:{
+        activeDialog(){
+            this.activeEdit = true;
+            this.$store.commit("setDialogFacturacion", true);
+        },
         getDataCorral: async function(){
             var self = this;
             const config = {
@@ -233,7 +266,7 @@ export default {
                     text: element.name,
                     value: element.id
                 })
-                if(self.select_corral == null){
+                if(self.filtData == null){
                     if(index == 0){
                         self.select_corral = element.id;
                     }
@@ -241,8 +274,8 @@ export default {
             });
 
             await this.filtCorral()
-            this.sales_chicken = null;
-            this.deaths_chicken = null;
+            this.sales_chicken = 0;
+            this.deaths_chicken = 0;
         },
         filtCorral: async function(){
             var self = this
@@ -252,7 +285,7 @@ export default {
                         id: element.id,
                         name: element.name,
                         num_chicken: parseInt(element.num_chicken),
-                        price_chicken: element.price_chicken,
+                        price_chicken: parseInt(element.price_chicken),
                         status: element.status,
                         sales_chicken: parseInt(element.sales_chicken),
                         deaths_chicken: parseInt(element.deaths_chicken),
@@ -268,14 +301,15 @@ export default {
         },
         registerCostos: async function(){
             this.loading = true;
-            var sales = (this.rules.tope_sales_chicken(this.sales_chicken == null || ' ' ? 0 : this.sales_chicken))
-            var death = (this.rules.tope_deaths_chicken(this.deaths_chicken == null || ' ' ? 0 : this.deaths_chicken))
+            var sales = this.rules.tope_sales_chicken(this.sales_chicken)
+            var death = this.rules.tope_deaths_chicken(this.deaths_chicken)
+            var veryInsumo = this.value_tope(parseInt(this.value_insumo))
 
-            if(sales && death){
+            if(sales == true && death == true && veryInsumo == true){
                 var self = this;
-                var sales_chicken = this.sales_chicken == null ? 0 : parseInt(this.sales_chicken);
-                var deaths_chicken = this.deaths_chicken == null ? 0 : parseInt(this.deaths_chicken);
-                var value_insumo  = this.value_insumo == null ? 0 : parseInt(this.value_insumo);
+                var sales_chicken = parseInt(this.sales_chicken);
+                var deaths_chicken = parseInt(this.deaths_chicken);
+                var value_insumo  = parseInt(this.value_insumo);
 
                 var obj = {        
                     name: this.filtData.name,
@@ -301,20 +335,37 @@ export default {
                     });
                 
                 if(this.notiSuccess){
-                    this.sales_chicken = null,
-                    this.deaths_chicken = null,
-                    this.value_insumo = null,
+                    this.sales_chicken = 0,
+                    this.deaths_chicken = 0,
+                    this.value_insumo = 0,
                     await this.getDataCorral();
                     await this.filtCorral();
                 }
             }else{
                 this.notiFail = true;
+                this.loading = false;
             }
         }
     },
     watch:{
-        deaths_chicken: function(){
-            console.log(this.rules.tope_sales_chicken(this.deaths_chicken))
+        '$store.state.dialogFacturacion': async function(){
+            this.activeEdit = this.$store.state.dialogFacturacion == false ? 
+            this.$store.state.dialogFacturacion : this.activeEdit;
+        },
+        '$store.state.countUpdate': async function(){
+            await this.getDataCorral();
+        },
+        sales_chicken(){
+            this.sales_chicken = !this.sales_chicken ? 
+            this.sales_chicken = 0 : this.sales_chicken = this.sales_chicken;
+        },
+        deaths_chicken(){
+            this.deaths_chicken = !this.deaths_chicken ? 
+            this.deaths_chicken = 0 : this.deaths_chicken = this.deaths_chicken;
+        },
+        value_insumo(){
+            this.value_insumo = !this.value_insumo ? 
+            this.value_insumo = 0 : this.value_insumo = this.value_insumo;
         }
     }
 }

@@ -206,6 +206,7 @@ export default {
     animation: loader 1s infinite;
     display: flex;
   }
+  
   @-moz-keyframes loader {
     from {
       transform: rotate(0);

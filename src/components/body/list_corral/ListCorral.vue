@@ -23,7 +23,7 @@
                                     <p class="text-a">Recaudo: {{ (item.price_chicken*item.sales_chicken).toLocaleString('es-CO') }}$</p> &nbsp;
                                 </div>
                                 <div class="panel-row">
-                                    <p class="text-a">Gastos de insumo: {{ item.value_insumo }}$</p>
+                                    <p class="text-a">Gastos de insumo: {{ (parseInt(item.value_insumo)).toLocaleString('es-CO') }}$</p>
                                 </div>
                             </v-expansion-panel-content>
                         </v-expansion-panel>
