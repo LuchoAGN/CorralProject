@@ -113,7 +113,7 @@
                         </v-btn>
                     </v-col>
 
-                    <v-col cols="7" v-if="activeFinish">
+                    <v-col cols="8" v-if="activeFinish">
                         <v-btn
                             :loading="loading"
                             :disabled="loading"
@@ -124,7 +124,7 @@
                             small
                             @click="facturarCorral();"
                         >
-                            Registrar costos
+                            Finalizar facturación
                             <template v-slot:loader>
                                 <span class="custom-loader">
                                     <v-icon light>mdi-cached</v-icon>
@@ -262,10 +262,12 @@ export default {
                 });
 
             this.dataCorral.map( function(element, index){
-                self.items.push({
-                    text: element.name,
-                    value: element.id
-                })
+                if(element.status == "active"){
+                    self.items.push({
+                        text: element.name,
+                        value: element.id
+                    })
+                }
                 if(self.filtData == null){
                     if(index == 0){
                         self.select_corral = element.id;
@@ -280,7 +282,7 @@ export default {
         filtCorral: async function(){
             var self = this
             this.dataCorral.map( function(element){
-                if(element.id == self.select_corral){
+                if(element.id == self.select_corral && element.status == "active"){
                     self.filtData = {
                         id: element.id,
                         name: element.name,
@@ -303,7 +305,7 @@ export default {
             this.loading = true;
             var sales = this.rules.tope_sales_chicken(this.sales_chicken)
             var death = this.rules.tope_deaths_chicken(this.deaths_chicken)
-            var veryInsumo = this.value_tope(parseInt(this.value_insumo))
+            var veryInsumo = this.rules.value_tope(parseInt(this.value_insumo))
 
             if(sales == true && death == true && veryInsumo == true){
                 var self = this;
@@ -341,10 +343,60 @@ export default {
                     await this.getDataCorral();
                     await this.filtCorral();
                 }
+                this.loading = false;
             }else{
                 this.notiFail = true;
                 this.loading = false;
             }
+        },
+        facturarCorral: async function(){
+            this.loading = true;
+            var self = this;
+            var obj = {        
+                name: this.filtData.name,
+                num_chicken: this.filtData.num_chicken,
+                price_chicken: this.filtData.price_chicken,
+                sales_chicken: this.filtData.sales_chicken,
+                deaths_chicken: this.filtData.deaths_chicken,
+                id_user: this.id_user,
+                value_insumo: this.filtData.value_insumo,
+                collected: ((this.filtData.price_chicken*this.filtData.num_chicken)-this.filtData.value_insumo)-(this.filtData.deaths_chicken*this.filtData.price_chicken),
+            };
+            const config = {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
+            };
+
+            await api
+                .requestOH("post", "/history", obj, config)
+                .then(() => {
+                    self.notiSuccess = true;
+                })
+                .catch(function () {
+                    self.notiFail = true;
+                });
+            
+            if(this.notiSuccess){
+                obj = {        
+                    name: this.filtData.name,
+                    num_chicken: this.filtData.num_chicken,
+                    price_chicken: this.filtData.price_chicken,
+                    status: "desactive",
+                    sales_chicken: 0,
+                    deaths_chicken: 0,
+                    id_user: this.id_user,
+                    value_insumo: 0,
+                };
+                await api
+                .requestOH("put", `/corrales/${this.filtData.id}`, obj, config)
+                .then(() => {
+                    self.notiSuccess = true;
+                })
+                .catch(function () {
+                    self.notiFail = true;
+                });
+                await this.getDataCorral();
+            }
+            this.loading = false;
         }
     },
     watch:{

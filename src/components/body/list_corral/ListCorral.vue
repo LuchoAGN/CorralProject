@@ -58,6 +58,7 @@ export default {
     methods:{
         getDataCorral: async function(){
             var self = this;
+            var dataC = [];
             const config = {
                 Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
             };
@@ -65,11 +66,17 @@ export default {
                 .requestH("get", `/corrales/${JSON.parse(localStorage.getItem('user')).dataperson.id}`, 
                     config)
                 .then((response) => {
-                    self.dataCorral = response.data;
+                    dataC = response.data;
                     self.overlay = false;
                 })
                 .catch(function () {
                 });
+            
+            dataC.map(function(element){
+                if(element.status == "active"){
+                    self.dataCorral.push(element)
+                }
+            })
         }
     }
 }
