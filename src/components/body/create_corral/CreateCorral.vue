@@ -302,13 +302,13 @@ export default {
             var self = this;
             var obj = {        
               name: this.nameDes,
-              num_chicken: this.nameDes,
+              num_chicken: this.num_chickenDes,
               price_chicken: this.price_chickenDes,
               status: "active",
               sales_chicken: 0,
               deaths_chicken: 0,
               id_user: this.id_user,
-              value_insumo: value_insumo,
+              value_insumo: 0,
             };
 
             const config = {
