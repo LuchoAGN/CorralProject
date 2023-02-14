@@ -11,6 +11,7 @@
                     <v-date-picker
                         class="ma-2"
                         v-model="dates"
+                        locale="es_CO"
                         range
                     ></v-date-picker>
                     <v-btn
