@@ -66,6 +66,7 @@
                   <v-list-item
                     v-for="(item, i) in dataCorral"
                     :key="i"
+                    @click="modalActiveCorral(item)"
                   >
                     <v-list-item-icon>
                         <font-awesome-icon icon="fa-solid fa-xmarks-lines" class="fa-3x" 
@@ -80,6 +81,80 @@
                 </v-list-item-group>
             </v-list>
         </v-card>
+
+        <v-dialog
+            transition="dialog-top-transition"
+            max-width="600"
+            v-model="modalCorral"
+        >
+            <v-card>
+                <v-toolbar
+                    dark
+                    color="#5F7C8A"
+                >
+                    <v-toolbar-title>Activar corral</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-toolbar-items>
+                        <v-btn
+                            icon
+                            dark
+                            @click="modalCorral = false"
+                        >
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                    </v-toolbar-items>
+                </v-toolbar>
+                <div class="mx-2 pa-2">
+                    <v-row class="mt-2">
+                        <v-col cols="12">
+                            <v-text-field
+                                height="13"
+                                v-model="nameDes"
+                                :rules="[rules.required]"
+                                label="Nombre del corral"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="6">
+                            <v-text-field
+                            type="number"
+                                height="13"
+                                v-model="num_chickenDes"
+                                :rules="[rules.required]"
+                                label="Numero de pollos"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                type="number"
+                                height="13"
+                                v-model="price_chickenDes"
+                                :rules="[rules.required]"
+                                label="Precio unitario de los pollos"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-btn
+                        :loading="loading"
+                        :disabled="loading"
+                        block
+                        class="mt-6"
+                        color="success"
+                        type="submit"
+                        small
+                        @click="activarCorral();"
+                    >
+                        Activar corral
+                        <template v-slot:loader>
+                            <span class="custom-loader">
+                                <v-icon light>mdi-cached</v-icon>
+                            </span>
+                        </template>
+                    </v-btn>
+                </div>
+            </v-card>
+        </v-dialog>
 
         <v-overlay :value="overlay">
             <v-progress-circular
@@ -121,10 +196,10 @@
             No se ha podido crear el <strong>Corral</strong>
             <template v-slot:action="{ attrs }">
                 <v-btn
-                color="red accent-2"
-                text
-                v-bind="attrs"
-                @click="notiFail = false"
+                    color="red accent-2"
+                    text
+                    v-bind="attrs"
+                    @click="notiFail = false"
                 >
                     <v-icon>
                         mdi-close
@@ -145,16 +220,22 @@ export default {
         return{
             overlay: true,
             loading: false,
+            modalCorral: false,
             rules: {
                 required: value => !!value || 'Requerido',
             },
             name: '',
             num_chicken: '',
             price_chicken: '',
+            nameDes: '',
+            num_chickenDes: '',
+            price_chickenDes: '',
             id_user: JSON.parse(localStorage.getItem('user')).dataperson.id,
+            token: JSON.parse(localStorage.getItem('user')).token,
             notiSuccess: false,
             notiFail: false,
-            dataCorral: []
+            dataCorral: [],
+            selectCorral: null,
         }
     },
     mounted(){
@@ -174,7 +255,7 @@ export default {
                 value_insumo: 0,
             };
             const config = {
-                Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,
+                Authorization: `Bearer ${this.token}`,
             };
             await api
                 .requestOH("post", "/corrales", obj, config)
@@ -206,6 +287,49 @@ export default {
                 })
                 .catch(function () {
                 });
+        },
+        modalActiveCorral(corral){
+
+            if(corral.status == "desactive"){
+                this.modalCorral = true;
+                this.selectCorral = corral;
+                this.nameDes = corral.name;
+                this.price_chickenDes = corral.price_chicken;
+                this.num_chickenDes = corral.num_chicken;
+            }
+        },
+        activarCorral: async function(){
+            var self = this;
+            var obj = {        
+              name: this.nameDes,
+              num_chicken: this.nameDes,
+              price_chicken: this.price_chickenDes,
+              status: "active",
+              sales_chicken: 0,
+              deaths_chicken: 0,
+              id_user: this.id_user,
+              value_insumo: value_insumo,
+            };
+
+            const config = {
+              Authorization: `Bearer ${this.token}`,
+          };
+          await api
+            .requestOH("put", `/corrales/${this.selectCorral.id}`, obj, config)
+            .then(() => {
+                self.notiSuccess = true;
+            })
+            .catch(function () {
+                self.notiFail = true;
+            });
+
+            if(self.notiSuccess){
+                this.getDataCorral();
+                this.nameDes = '';
+                this.num_chickenDes = '';
+                this.price_chickenDes = '';
+                this.modalCorral = false;
+            }
         }
     }
 }
