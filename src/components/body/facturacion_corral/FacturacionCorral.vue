@@ -29,7 +29,7 @@
                 </div>
                 <div class="panel-row">
                     <p class="text-a">Total vendidos: {{ filtData.sales_chicken }}</p> &nbsp;
-                    <p class="text-a">Recaudo: {{ (filtData.price_chicken*filtData.sales_chicken).toLocaleString('es-CO') }}$</p> &nbsp;
+                    <p class="text-a">Recaudo: {{ (filtData.price_chicken*filtData.sales_chicken-parseInt(filtData.value_insumo)).toLocaleString('es-CO') }}$</p> &nbsp;
                 </div>
                 <div class="panel-row">
                     <p class="text-a">Gastos de insumo: {{ filtData.value_insumo }}$</p>

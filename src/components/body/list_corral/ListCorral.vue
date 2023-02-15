@@ -20,7 +20,7 @@
                                 </div>
                                 <div class="panel-row">
                                     <p class="text-a">Total vendidos: {{ item.sales_chicken }}</p> &nbsp;
-                                    <p class="text-a">Recaudo: {{ (item.price_chicken*item.sales_chicken).toLocaleString('es-CO') }}$</p> &nbsp;
+                                    <p class="text-a">Recaudo: {{ (item.price_chicken*item.sales_chicken-parseInt(item.value_insumo)).toLocaleString('es-CO') }}$</p> &nbsp;
                                 </div>
                                 <div class="panel-row">
                                     <p class="text-a">Gastos de insumo: {{ (parseInt(item.value_insumo)).toLocaleString('es-CO') }}$</p>
